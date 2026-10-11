@@ -1,1 +1,281 @@
-# mandull-love
+
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#09090d">
+  <title>Мандул 🖤</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at top, #301522 0%, transparent 55%),
+        #09090d;
+      color: #fff5f7;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 42px 24px;
+      text-align: center;
+      border: 1px solid #693347;
+      border-radius: 26px;
+      background: rgba(22, 17, 24, 0.94);
+      box-shadow: 0 0 65px #e6386820;
+      position: relative;
+      z-index: 1;
+    }
+
+    .heart {
+      font-size: 42px;
+      animation: heartbeat 1.5s infinite;
+    }
+
+    .small {
+      margin-top: 20px;
+      color: #e5a4b8;
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 14px 0;
+      font-size: clamp(36px, 11vw, 52px);
+      font-weight: normal;
+      font-style: italic;
+    }
+
+    .question {
+      font-size: 19px;
+      line-height: 1.8;
+      color: #eadde3;
+    }
+
+    .note {
+      margin-top: 22px;
+      color: #c99aaa;
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .buttons {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-height: 130px;
+      margin-top: 12px;
+    }
+
+    button {
+      font: inherit;
+      font-size: 15px;
+      border-radius: 50px;
+      padding: 14px 25px;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #yes {
+      color: white;
+      background: linear-gradient(135deg, #f14e83, #b81751);
+      border: 0;
+      box-shadow: 0 6px 25px #ec387044;
+      transition: transform 0.2s;
+    }
+
+    #yes:active {
+      transform: scale(0.94);
+    }
+
+    #no {
+      color: #f4dbe4;
+      background: #211720;
+      border: 1px solid #654050;
+      z-index: 5;
+    }
+
+    #result {
+      display: none;
+      margin-top: 20px;
+      line-height: 1.8;
+      color: #ffb5cd;
+      font-size: 19px;
+      animation: appear 0.6s ease;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #806875;
+      font-size: 11px;
+      letter-spacing: 2px;
+    }
+
+    .floating {
+      position: fixed;
+      bottom: -30px;
+      pointer-events: none;
+      animation: floatUp linear forwards;
+      z-index: 0;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    @keyframes floatUp {
+      to {
+        transform: translateY(-115vh) rotate(35deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 360px) {
+      .card { padding: 32px 16px; }
+      .question { font-size: 17px; }
+      button { padding: 13px 19px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <div class="heart">🖤</div>
+
+    <div class="small">a little message for you</div>
+
+    <h1>Мандул,</h1>
+
+    <div class="question">
+      Надтай ганц удаа уулзах цаг гаргаач pls? 🥹
+    </div>
+
+    <div class="note">Нэг л удаа боломж олгооч... 🤍</div>
+
+    <div class="buttons" id="buttons">
+      <button id="yes">♥ ТИЙМ</button>
+      <button id="no">ҮГҮЙ</button>
+    </div>
+
+    <div id="result" role="status" aria-live="polite">
+      Үнэн гэж үү? 🥹❤️<br>
+      Чамтай уулзах өдрөө тэсэн ядан хүлээе.<br>
+      <span style="font-size:15px">Надад боломж өгсөнд баярлалаа 🖤</span>
+    </div>
+
+    <div class="footer">MADE WITH ♡ JUST FOR YOU</div>
+  </main>
+
+  <script>
+    const yes = document.getElementById("yes");
+    const no = document.getElementById("no");
+    const buttons = document.getElementById("buttons");
+    const result = document.getElementById("result");
+
+    let attempts = 0;
+
+    function runAway() {
+      attempts++;
+
+      // Эхлээд товчийг дэлгэцийн тогтсон байрлалд оруулна.
+      if (getComputedStyle(no).position !== "fixed") {
+        const rect = no.getBoundingClientRect();
+        no.style.position = "fixed";
+        no.style.left = rect.left + "px";
+        no.style.top = rect.top + "px";
+      }
+
+      const margin = 12;
+      const maxX = Math.max(margin, window.innerWidth - no.offsetWidth - margin);
+      const maxY = Math.max(margin, window.innerHeight - no.offsetHeight - margin);
+
+      const x = margin + Math.random() * (maxX - margin);
+      const y = margin + Math.random() * (maxY - margin);
+
+      no.style.left = x + "px";
+      no.style.top = y + "px";
+
+      if (attempts === 3) {
+        no.textContent = "Бариад үз 😝";
+      } else if (attempts >= 6) {
+        no.textContent = "Үнэхээр үгүй гэж үү? 🥺";
+      }
+    }
+
+    // Компьютер дээр хулгана ойртоход зугтана.
+    no.addEventListener("pointerenter", (event) => {
+      if (event.pointerType === "mouse") runAway();
+    });
+
+    // Утас болон бусад төхөөрөмж дээр дарахад зугтана.
+    no.addEventListener("click", (event) => {
+      event.preventDefault();
+      runAway();
+    });
+
+    yes.addEventListener("click", () => {
+      result.style.display = "block";
+      buttons.style.display = "none";
+      document.querySelector(".note").textContent =
+        "Өнөөдрийн хамгийн гоё мэдээ боллоо 🥹";
+      document.querySelector(".heart").textContent = "❤️";
+
+      for (let i = 0; i < 24; i++) {
+        setTimeout(createHeart, i * 90);
+      }
+    });
+
+    function createHeart() {
+      const el = document.createElement("div");
+      el.className = "floating";
+      el.textContent = ["♥", "♡", "✦", "💗"][
+        Math.floor(Math.random() * 4)
+      ];
+
+      el.style.left = Math.random() * 100 + "vw";
+      el.style.fontSize = (14 + Math.random() * 24) + "px";
+      el.style.color = ["#ff709b", "#e8afc5", "#ffffff"][
+        Math.floor(Math.random() * 3)
+      ];
+      el.style.animationDuration = (3 + Math.random() * 4) + "s";
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 7500);
+    }
+
+    // Арын хэсэгт жижигхэн хөвөх зүрхнүүд.
+    setInterval(createHeart, 950);
+  </script>
+</body>
+</html>
